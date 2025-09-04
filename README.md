@@ -15,10 +15,8 @@ In this repository, you manage two environments using two branches:
 
 ```mermaid
 flowchart TD
-  subgraph GitHub_Repo
-    A[main branch] --Deploys production-site/--> B[gh-pages branch (Production Site)]
-    C[qa branch] --Deploys qa-site/--> D[gh-pages-qa branch (QA Site)]
-  end
+  A[main branch] --Deploys production-site/--> B[gh-pages branch (Production Site)]
+  C[qa branch] --Deploys qa-site/--> D[gh-pages-qa branch (QA Site)]
   E[Developer creates feature branch] --> A
   E --> C
   F[Pull Request / QA Review] --> C
