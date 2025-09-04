@@ -15,14 +15,14 @@ In this repository, you manage two environments using two branches:
 
 ```mermaid
 flowchart TD
-  subgraph GitHub Repo
-    A[main branch] -->|Deploys production-site/| B[gh-pages branch (Production Site)]
-    C[qa branch] -->|Deploys qa-site/| D[gh-pages-qa branch (QA Site)]
+  subgraph GitHub_Repo
+    A[main branch] -- Deploys production-site/ --> B[gh-pages branch (Production Site)]
+    C[qa branch] -- Deploys qa-site/ --> D[gh-pages-qa branch (QA Site)]
   end
   E[Developer creates feature branch] --> A
   E --> C
   F[Pull Request / QA Review] --> C
-  C -->|After QA approval| A
+  C -- After QA approval --> A
 ```
 
 **Explanation:**
@@ -59,12 +59,9 @@ flowchart TD
 
 ## Notes
 
-- The test `Navigation to Login, Register, Contact, Features works` may need selector adjustments if multiple `<h2>` elements are present on the page.
 - To view Playwright HTML reports locally, run:
   ```
   npx playwright show-report
   ```
 
 ---
-
-This setup is designed to showcase your understanding of environments, branching, and automated CI/CD for potential employers.
