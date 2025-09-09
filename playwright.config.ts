@@ -6,10 +6,11 @@ export default defineConfig({
     reporter: [['list'], ['html', { outputFolder: 'playwright-report' }]],
     projects: [
         {
-            name: 'personal-site',
+            name: 'CI/CD Pipeline',
             testDir: 'tests/ui',
             use: {
-                baseURL: 'https://padraic79.github.io/AutomationProjects/',
+                // Use BASE_URL from environment if set, otherwise default to local
+                baseURL: process.env.BASE_URL || 'http://localhost:3000',
                 headless: true,
                 screenshot: 'only-on-failure',
                 video: 'retain-on-failure',

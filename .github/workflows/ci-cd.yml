@@ -20,6 +20,8 @@ jobs:
         run: npm ci
       - name: Run Playwright tests
         run: npx playwright test
+        env:
+          BASE_URL: https://padraic79.github.io/ProductionReadyCI-CD/
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v4
@@ -48,6 +50,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      - name: Run Playwright tests (QA)
+        run: npx playwright test
+        env:
+          BASE_URL: https://padraic79.github.io/ProductionReadyCI-CD/
       - name: Deploy to GitHub Pages (QA)
         uses: peaceiris/actions-gh-pages@v4
         with:
