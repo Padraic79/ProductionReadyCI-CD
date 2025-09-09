@@ -1,77 +1,77 @@
-name: CI/CD Pipeline
+name: CI/CD Pipeline # This is the name of the workflow as it will appear in GitHub Actions
 
-on:
-  push:
-    branches: [main, qa]
-  pull_request:
-    branches: [main, qa]
+on: # This section defines when the workflow should run
+  push: # Run workflow when code is pushed
+    branches: [main, qa] # Only run on pushes to main or qa branches
+  pull_request: # Run workflow when a pull request is opened or updated
+    branches: [main, qa] # Only run on pull requests targeting main or qa
 
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+jobs: # This section defines the different jobs (sets of steps) in the workflow
+  test: # This job runs the tests
+    runs-on: ubuntu-latest # Use the latest Ubuntu runner provided by GitHub
+    steps: # List of steps to run in this job
+      - name: Checkout code # Step 1: Get the code from the repository
+        uses: actions/checkout@v4 # Use the official GitHub action to check out code
+      - name: Set up Node.js # Step 2: Set up Node.js environment
+        uses: actions/setup-node@v4 # Use the official Node.js setup action
         with:
-          node-version: 20
-      - name: Install dependencies
-        run: npm ci
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
-      - name: Install static server
-        run: npm install -g serve
-      - name: Serve production-site locally
-        run: nohup serve -l 3000 production-site &
-      - name: Wait for local server to be ready
+          node-version: 20 # Specify Node.js version 20
+      - name: Install dependencies # Step 3: Install project dependencies
+        run: npm ci # Use npm ci for clean, fast install based on package-lock.json
+      - name: Install Playwright Browsers # Step 4: Install browsers needed for Playwright
+        run: npx playwright install --with-deps # Installs Playwright and browser dependencies
+      - name: Install static server # Step 5: Install a simple static file server globally
+        run: npm install -g serve # Installs 'serve' so we can host the site locally
+      - name: Serve production-site locally # Step 6: Start the static server in the background
+        run: nohup serve -l 3000 production-site & # Serve the production-site folder on port 3000
+      - name: Wait for local server to be ready # Step 7: Wait for the server to be ready before testing
         run: |
-          for i in {1..10}; do
-            nc -z localhost 3000 && echo 'Server is up!' && break
+          for i in {1..10}; do # Try up to 10 times
+            nc -z localhost 3000 && echo 'Server is up!' && break # Check if port 3000 is open
             echo 'Waiting for server...'
-            sleep 2
+            sleep 2 # Wait 2 seconds before retrying
           done
-      - name: Run Playwright tests (local)
-        run: npx playwright test
+      - name: Run Playwright tests (local) # Step 8: Run Playwright tests against the local server
+        run: npx playwright test # Run all Playwright tests
         env:
-          BASE_URL: http://localhost:3000
-      - name: Upload Playwright report
-        if: always()
-        uses: actions/upload-artifact@v4
+          BASE_URL: http://localhost:3000 # Set the base URL for tests to the local server
+      - name: Upload Playwright report # Step 9: Upload the Playwright test report as an artifact
+        if: always() # Always run this step, even if previous steps fail
+        uses: actions/upload-artifact@v4 # Use the upload-artifact action
         with:
-          name: playwright-report
-          path: playwright-report
+          name: playwright-report # Name the artifact 'playwright-report'
+          path: playwright-report # Path to the report folder
 
-  deploy-production:
-    if: github.ref == 'refs/heads/main'
-    needs: test
-    runs-on: ubuntu-latest
+  deploy-production: # This job deploys the production site
+    if: github.ref == 'refs/heads/main' # Only run this job on the main branch
+    needs: test # Wait for the test job to finish first
+    runs-on: ubuntu-latest # Use the latest Ubuntu runner
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: List production-site contents
-        run: ls -l production-site
-      - name: Deploy to GitHub Pages (Production)
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Checkout code # Step 1: Get the code from the repository
+        uses: actions/checkout@v4 # Use the official checkout action
+      - name: List production-site contents # Step 2: Show files in production-site for debugging
+        run: ls -l production-site # List files to verify they exist before deploying
+      - name: Deploy to GitHub Pages (Production) # Step 3: Deploy the site to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4 # Use the popular GitHub Pages deploy action
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./production-site
-          publish_branch: gh-pages
+          github_token: ${{ secrets.GITHUB_TOKEN }} # Use the GitHub token for authentication
+          publish_dir: ./production-site # Deploy the production-site folder
+          publish_branch: gh-pages # Deploy to the gh-pages branch
 
-  deploy-qa:
-    if: github.ref == 'refs/heads/qa'
-    needs: test
-    runs-on: ubuntu-latest
+  deploy-qa: # This job deploys the QA site
+    if: github.ref == 'refs/heads/qa' # Only run this job on the qa branch
+    needs: test # Wait for the test job to finish first
+    runs-on: ubuntu-latest # Use the latest Ubuntu runner
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Run Playwright tests (QA)
-        run: npx playwright test
+      - name: Checkout code # Step 1: Get the code from the repository
+        uses: actions/checkout@v4 # Use the official checkout action
+      - name: Run Playwright tests (QA) # Step 2: Run Playwright tests against the deployed QA site
+        run: npx playwright test # Run all Playwright tests
         env:
-          BASE_URL: https://padraic79.github.io/ProductionReadyCI-CD/
-      - name: Deploy to GitHub Pages (QA)
-        uses: peaceiris/actions-gh-pages@v4
+          BASE_URL: https://padraic79.github.io/ProductionReadyCI-CD/ # Set the base URL for tests to the QA site
+      - name: Deploy to GitHub Pages (QA) # Step 3: Deploy the QA site to a separate branch
+        uses: peaceiris/actions-gh-pages@v4 # Use the GitHub Pages deploy action
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./qa-site
-          publish_branch: gh-pages-qa
+          github_token: ${{ secrets.GITHUB_TOKEN }} # Use the GitHub token for authentication
+          publish_dir: ./qa-site # Deploy the qa-site folder
+          publish_branch: gh-pages-qa # Deploy to the gh-pages-qa branch
