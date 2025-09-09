@@ -24,6 +24,10 @@ jobs: # This section defines the different jobs (sets of steps) in the workflow
         run: npx playwright install --with-deps # Installs Playwright and browser dependencies
       - name: Install static server # Step 5: Install a simple static file server globally
         run: npm install -g serve # Installs 'serve' so we can host the site locally
+      - name: Add node_modules/.bin to PATH # Step 5.5: Ensure Playwright CLI is found
+        run: echo "$(pwd)/node_modules/.bin" >> $GITHUB_PATH
+      - name: Ensure playwright is executable # Step 5.6: Fix permissions for Playwright binary
+        run: chmod +x node_modules/.bin/playwright || true
       - name: Serve production-site locally # Step 6: Start the static server in the background
         run: nohup serve -l 3000 production-site & # Serve the production-site folder on port 3000
       - name: Wait for local server to be ready # Step 7: Wait for the server to be ready before testing
