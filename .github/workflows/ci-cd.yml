@@ -49,6 +49,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      - name: List production-site contents
+        run: ls -l production-site
       - name: Deploy to GitHub Pages (Production)
         uses: peaceiris/actions-gh-pages@v4
         with:
