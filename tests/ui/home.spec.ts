@@ -5,7 +5,7 @@ test.describe("Personal Site Smoke Tests", () => {
     test("Home page loads and header is visible", async ({ page }) => {
         const home = new HomePage(page);
         await home.goto();
-        await expect(home.header).toHaveText("Playwright Demo Site");
+        await expect(home.header).toHaveText("Playwright Demo Site with CI/CD Pipeline");
     });
 
     test("Navigation to Login, Register, Contact, Features works", async ({ page }) => {
