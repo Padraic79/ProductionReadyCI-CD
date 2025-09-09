@@ -18,7 +18,7 @@ export class HomePage {
     }
 
     async goto() {
-        await this.page.goto("https://padraic79.github.io/AutomationProjects/");
+        await this.page.goto("/");
     }
 
     async navigateTo(section: "Login" | "Register" | "Contact" | "Features") {
