@@ -85,12 +85,15 @@ jobs: # This section defines the different jobs (sets of steps) in the workflow
         run: ls -l node_modules/.bin/playwright
       - name: Run Playwright tests (QA) # Step 2: Run Playwright tests against the deployed QA site
  main:
-        run: npx playwright test # Run all Playwright tests
-        env:
-          BASE_URL: https://padraic79.github.io/ProductionReadyCI-CD/ # Set the base URL for tests to the QA site
-      - name: Deploy to GitHub Pages (QA) # Step 7: Deploy the QA site to a separate branch
-        uses: peaceiris/actions-gh-pages@v4 # Use the GitHub Pages deploy action
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }} # Use the GitHub token for authentication
-          publish_dir: ./qa-site # Deploy the qa-site folder
-          publish_branch: gh-pages-qa # Deploy to the gh-pages-qa branch
+  runs-on: ubuntu-latest
+  steps:
+    - name: Run Playwright tests
+      run: npx playwright test
+      env:
+        BASE_URL: https://Padraic79.github.io/ProductionReadyCI-CD/
+    - name: Deploy to Github Pages (QA)
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./qa-site
+        publish_branch: gh-pages-qa
