@@ -20,10 +20,14 @@ jobs: # This section defines the different jobs (sets of steps) in the workflow
           node-version: 20 # Specify Node.js version 20
       - name: Install dependencies # Step 3: Install project dependencies
         run: npm ci # Use npm ci for clean, fast install based on package-lock.json
-      - name: Check Playwright binary # Step 3.1: Check if Playwright binary exists
-        run: ls -l node_modules/.bin/playwright || echo "Playwright binary not found"
-      - name: Re-install Playwright CLI if missing # Step 3.2: Ensure Playwright is installed
+      - name: Ensure Playwright CLI is installed # Step 3.1: Ensure Playwright is installed
         run: npm install @playwright/test --save-dev
+      - name: Ensure playwright is executable # Step 3.2: Fix permissions for Playwright binary
+        run: chmod +x node_modules/.bin/playwright || true
+      - name: Rebuild npm packages # Step 3.3: Rebuild npm packages for environment
+        run: npm rebuild
+      - name: Check Playwright binary # Step 3.4: Check if Playwright binary exists
+        run: ls -l node_modules/.bin/playwright || echo "Playwright binary not found"
       - name: Install Playwright Browsers # Step 4: Install browsers needed for Playwright
         run: npx playwright install --with-deps # Installs Playwright and browser dependencies
       - name: Install static server # Step 5: Install a simple static file server globally
