@@ -22,22 +22,26 @@ jobs: # This section defines the different jobs (sets of steps) in the workflow
         run: npm ci # Use npm ci for clean, fast install based on package-lock.json
       - name: Install Playwright Browsers # Step 4: Install browsers needed for Playwright
         run: npx playwright install --with-deps # Installs Playwright and browser dependencies
-      - name: Install static server # Step 5: Install a simple static file server globally
+      - name: Fix Playwright binary permissions # Step 5: Ensure Playwright binary is executable
+        run: chmod +x node_modules/.bin/playwright # Make Playwright binary executable
+      - name: Verify Playwright binary permissions # Step 6: Debug step to verify permissions
+        run: ls -l node_modules/.bin/playwright # Check if Playwright binary has correct permissions
+      - name: Install static server # Step 7: Install a simple static file server globally
         run: npm install -g serve # Installs 'serve' so we can host the site locally
-      - name: Serve production-site locally # Step 6: Start the static server in the background
+      - name: Serve production-site locally # Step 8: Start the static server in the background
         run: nohup serve -l 3000 production-site & # Serve the production-site folder on port 3000
-      - name: Wait for local server to be ready # Step 7: Wait for the server to be ready before testing
+      - name: Wait for local server to be ready # Step 9: Wait for the server to be ready before testing
         run: |
           for i in {1..10}; do # Try up to 10 times
             nc -z localhost 3000 && echo 'Server is up!' && break # Check if port 3000 is open
             echo 'Waiting for server...'
             sleep 2 # Wait 2 seconds before retrying
           done
-      - name: Run Playwright tests (local) # Step 8: Run Playwright tests against the local server
+      - name: Run Playwright tests (local) # Step 10: Run Playwright tests against the local server
         run: npx playwright test # Run all Playwright tests
         env:
           BASE_URL: http://localhost:3000 # Set the base URL for tests to the local server
-      - name: Upload Playwright report # Step 9: Upload the Playwright test report as an artifact
+      - name: Upload Playwright report # Step 11: Upload the Playwright test report as an artifact
         if: always() # Always run this step, even if previous steps fail
         uses: actions/upload-artifact@v4 # Use the upload-artifact action
         with:
@@ -67,11 +71,21 @@ jobs: # This section defines the different jobs (sets of steps) in the workflow
     steps:
       - name: Checkout code # Step 1: Get the code from the repository
         uses: actions/checkout@v4 # Use the official checkout action
-      - name: Run Playwright tests (QA) # Step 2: Run Playwright tests against the deployed QA site
+      - name: Set up Node.js # Step 2: Set up Node.js environment
+        uses: actions/setup-node@v4 # Use the official Node.js setup action
+        with:
+          node-version: 20 # Specify Node.js version 20
+      - name: Install dependencies # Step 3: Install project dependencies
+        run: npm ci # Use npm ci for clean, fast install based on package-lock.json
+      - name: Install Playwright Browsers # Step 4: Install browsers needed for Playwright
+        run: npx playwright install --with-deps # Installs Playwright and browser dependencies
+      - name: Fix Playwright binary permissions # Step 5: Ensure Playwright binary is executable
+        run: chmod +x node_modules/.bin/playwright # Make Playwright binary executable
+      - name: Run Playwright tests (QA) # Step 6: Run Playwright tests against the deployed QA site
         run: npx playwright test # Run all Playwright tests
         env:
           BASE_URL: https://padraic79.github.io/ProductionReadyCI-CD/ # Set the base URL for tests to the QA site
-      - name: Deploy to GitHub Pages (QA) # Step 3: Deploy the QA site to a separate branch
+      - name: Deploy to GitHub Pages (QA) # Step 7: Deploy the QA site to a separate branch
         uses: peaceiris/actions-gh-pages@v4 # Use the GitHub Pages deploy action
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }} # Use the GitHub token for authentication
