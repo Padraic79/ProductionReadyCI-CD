@@ -1,4 +1,6 @@
 name: CI/CD Pipeline # This is the name of the workflow as it will appear in GitHub Actions
+permissions:
+  contents: write # Allow GitHub Actions to push to branches like gh-pages
 
 on: # This section defines when the workflow should run
   push: # Run workflow when code is pushed
