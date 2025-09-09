@@ -1,4 +1,5 @@
-name: CI/CD Pipeline # This is the name of the workflow as it will appear in GitHub Actions
+name: CI/CD Pipeline
+# This is the name of the workflow as it will appear in GitHub Actions
 permissions:
   contents: write # Allow GitHub Actions to push to branches like gh-pages
 
@@ -22,11 +23,7 @@ jobs: # This section defines the different jobs (sets of steps) in the workflow
         run: npm ci # Use npm ci for clean, fast install based on package-lock.json
       - name: Install Playwright Browsers # Step 4: Install browsers needed for Playwright
         run: npx playwright install --with-deps # Installs Playwright and browser dependencies
-      - name: Fix Playwright binary permissions # Step 5: Ensure Playwright binary is executable
-        run: chmod +x node_modules/.bin/playwright # Make Playwright binary executable
-      - name: Verify Playwright binary permissions # Step 6: Debug step to verify permissions
-        run: ls -l node_modules/.bin/playwright # Check if Playwright binary has correct permissions
-      - name: Install static server # Step 7: Install a simple static file server globally
+
         run: npm install -g serve # Installs 'serve' so we can host the site locally
       - name: Serve production-site locally # Step 8: Start the static server in the background
         run: nohup serve -l 3000 production-site & # Serve the production-site folder on port 3000
@@ -70,7 +67,7 @@ jobs: # This section defines the different jobs (sets of steps) in the workflow
     runs-on: ubuntu-latest # Use the latest Ubuntu runner
     steps:
       - name: Checkout code # Step 1: Get the code from the repository
-        uses: actions/checkout@v4 # Use the official checkout action
+        uses: actions/checkout@v4 # Use the official checkout  copilot/fix-playwright-executable-permissions
       - name: Set up Node.js # Step 2: Set up Node.js environment
         uses: actions/setup-node@v4 # Use the official Node.js setup action
         with:
@@ -81,7 +78,13 @@ jobs: # This section defines the different jobs (sets of steps) in the workflow
         run: npx playwright install --with-deps # Installs Playwright and browser dependencies
       - name: Fix Playwright binary permissions # Step 5: Ensure Playwright binary is executable
         run: chmod +x node_modules/.bin/playwright # Make Playwright binary executable
-      - name: Run Playwright tests (QA) # Step 6: Run Playwright tests against the deployed QA site
+      - name: Run Playwright tests (QA) # Step 6: Run Playwright tests against the deployed QA s
+      - name: Make Playwright CLI executable # NEW: Ensure Playwright CLI has executable permissions
+        run: chmod +x node_modules/.bin/playwright
+      - name: Debug Playwright CLI permissions # NEW: Debug permissions
+        run: ls -l node_modules/.bin/playwright
+      - name: Run Playwright tests (QA) # Step 2: Run Playwright tests against the deployed QA site
+ main
         run: npx playwright test # Run all Playwright tests
         env:
           BASE_URL: https://padraic79.github.io/ProductionReadyCI-CD/ # Set the base URL for tests to the QA site
