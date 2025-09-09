@@ -10,7 +10,7 @@ on: # This section defines when the workflow should run
 
 jobs: # This section defines the different jobs (sets of steps) in the workflow
   test: # This job runs the tests
-    runs-on: ubuntu-latest # Use the latest Ubuntu runner provided by GitHub
+    runs-on: ubuntu-22.04 # Use Ubuntu 22.04 runner for better reliability and speed
     steps: # List of steps to run in this job
       - name: Checkout code # Step 1: Get the code from the repository
         uses: actions/checkout@v4 # Use the official GitHub action to check out code
@@ -51,7 +51,7 @@ jobs: # This section defines the different jobs (sets of steps) in the workflow
   deploy-production: # This job deploys the production site
     if: github.ref == 'refs/heads/main' # Only run this job on the main branch
     needs: test # Wait for the test job to finish first
-    runs-on: ubuntu-latest # Use the latest Ubuntu runner
+    runs-on: ubuntu-22.04 # Use Ubuntu 22.04 runner for better reliability and speed
     steps:
       - name: Checkout code # Step 1: Get the code from the repository
         uses: actions/checkout@v4 # Use the official checkout action
@@ -67,7 +67,7 @@ jobs: # This section defines the different jobs (sets of steps) in the workflow
   deploy-qa: # This job deploys the QA site
     if: github.ref == 'refs/heads/qa' # Only run this job on the qa branch
     needs: test # Wait for the test job to finish first
-    runs-on: ubuntu-latest # Use the latest Ubuntu runner
+    runs-on: ubuntu-22.04 # Use Ubuntu 22.04 runner for better reliability and speed
     steps:
       - name: Checkout code # Step 1: Get the code from the repository
         uses: actions/checkout@v4 # Use the official checkout action
